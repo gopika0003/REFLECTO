@@ -1,0 +1,32 @@
+{% extends "diary/base.html" %}
+{% block title %}✦ REFLECTO — Your Personal Diary ✦{% endblock %}
+{% block extra_head %}
+<style>
+  .home-wrap { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem; }
+  .home-card { text-align:center; max-width:460px; width:100%; padding:3rem 2.5rem; }
+  .home-logo { font-family:var(--font-brand); font-size:2.8rem; color:var(--primary); letter-spacing:0.04em; margin-bottom:0.4rem; text-shadow:0 0 24px rgba(189,108,140,0.3); }
+  .home-tagline { font-family:var(--font-ui); font-size:12px; color:var(--text-muted); letter-spacing:0.2em; text-transform:uppercase; margin-bottom:1.8rem; }
+  .home-desc { font-family:var(--font-entry); font-size:15px; color:var(--text-muted); line-height:1.8; margin-bottom:2.2rem; font-style:italic; }
+  .home-actions { display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; }
+  .pixel-stars { display:flex; justify-content:center; gap:0.6rem; margin-bottom:1.5rem; font-size:14px; color:var(--primary); }
+  .pixel-stars span { animation:twinkle 2s ease-in-out infinite; }
+  .pixel-stars span:nth-child(2) { animation-delay:0.4s; }
+  .pixel-stars span:nth-child(3) { animation-delay:0.8s; }
+  .pixel-stars span:nth-child(4) { animation-delay:1.2s; }
+  .pixel-stars span:nth-child(5) { animation-delay:1.6s; }
+</style>
+{% endblock %}
+{% block body %}
+<div class="home-wrap">
+  <div class="card card-pixel home-card fade-in">
+    <div class="pixel-stars"><span>✦</span><span>✧</span><span>★</span><span>✧</span><span>✦</span></div>
+    <div class="home-logo">Reflecto</div>
+    <p class="home-tagline">✨ your personal diary ✨</p>
+    <p class="home-desc">A magical space to capture your thoughts,<br>store your memories, and reflect on your journey.</p>
+    <div class="home-actions">
+      <a href="{% url 'login' %}" class="btn btn-primary">✦ Begin Writing</a>
+      <a href="{% url 'register' %}" class="btn btn-ghost">Create Account</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

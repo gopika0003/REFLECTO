@@ -1,0 +1,70 @@
+{% extends "diary/base.html" %}
+{% block title %}Admin Dashboard ✦ REFLECTO{% endblock %}
+{% block extra_head %}
+<style>
+  .stats-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; margin-bottom:2rem; }
+  .stat-card { background:var(--surface); border:1.5px solid var(--border); border-radius:var(--radius); padding:1.6rem; text-align:center; backdrop-filter:blur(14px); }
+  .stat-label { font-family:var(--font-ui); font-size:11px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:var(--text-muted); margin-bottom:0.5rem; }
+  .stat-value { font-family:var(--font-display); font-size:2.2rem; font-weight:700; color:var(--primary); line-height:1; }
+  .admin-table-wrap { background:var(--surface); border:1.5px solid var(--border); border-radius:var(--radius); overflow:hidden; backdrop-filter:blur(14px); }
+  table { width:100%; border-collapse:collapse; }
+  thead tr { background:rgba(189,108,140,0.09); border-bottom:1px solid var(--border2); }
+  th { padding:0.9rem 1.2rem; text-align:left; font-family:var(--font-ui); font-size:11px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:var(--text-muted); }
+  td { padding:0.9rem 1.2rem; font-family:var(--font-ui); font-size:13px; color:var(--text-muted); border-bottom:1px solid var(--border); }
+  tbody tr:last-child td { border-bottom:none; }
+  tbody tr:hover td { background:rgba(189,108,140,0.05); color:var(--text); }
+  .entry-badge { display:inline-block; padding:0.2rem 0.65rem; border-radius:999px; font-family:var(--font-ui); font-size:11px; font-weight:600; background:rgba(189,108,140,0.12); border:1px solid rgba(189,108,140,0.3); color:var(--primary); }
+  .username-cell { font-family:var(--font-entry); font-weight:500; color:var(--text); font-size:14px; }
+  @media(max-width:640px) { .stats-grid { grid-template-columns:1fr 1fr; } th:nth-child(4), td:nth-child(4) { display:none; } }
+</style>
+{% endblock %}
+{% block body %}
+<nav class="topnav">
+  <a href="{% url 'home' %}" class="brand">Reflecto</a>
+  <div class="nav-links">
+    <a href="/admin/" class="nav-link">Django Admin</a>
+    <form method="post" action="{% url 'logout' %}" style="display:inline">
+      {% csrf_token %}<button type="submit" class="btn btn-ghost btn-sm">Sign out</button>
+    </form>
+  </div>
+</nav>
+<div class="main-content">
+  <div class="page-heading fade-in">
+    <h1>Admin Dashboard</h1>
+    <p class="sub">Overview of all users and activity</p>
+  </div>
+  <div class="stats-grid fade-in">
+    <div class="stat-card">
+      <p class="stat-label">Total Users</p>
+      <p class="stat-value">{{ total_users }}</p>
+    </div>
+    <div class="stat-card">
+      <p class="stat-label">Most Active</p>
+      <p class="stat-value" style="font-size:1.3rem; margin-top:0.3rem;">{% if users %}{{ users.0.username }}{% else %}—{% endif %}</p>
+    </div>
+    <div class="stat-card">
+      <p class="stat-label">Top Entry Count</p>
+      <p class="stat-value">{% if users %}{{ users.0.entry_count }}{% else %}0{% endif %}</p>
+    </div>
+  </div>
+  <div class="admin-table-wrap fade-in-2">
+    <table>
+      <thead>
+        <tr><th>Username</th><th>Date Joined</th><th>Entries</th><th>Last Login</th></tr>
+      </thead>
+      <tbody>
+        {% for user in users %}
+        <tr>
+          <td class="username-cell">{{ user.username }}</td>
+          <td>{{ user.date_joined|date:"d M Y" }}</td>
+          <td><span class="entry-badge">{{ user.entry_count }}</span></td>
+          <td>{% if user.last_login %}{{ user.last_login|date:"d M Y" }}{% else %}<span style="color:var(--text-dim)">Never</span>{% endif %}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4" style="text-align:center; color:var(--text-dim); padding:2rem;">No users found</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

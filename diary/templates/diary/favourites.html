@@ -1,0 +1,53 @@
+{% extends "diary/base.html" %}
+{% block title %}Favourites ✦ REFLECTO{% endblock %}
+{% block extra_head %}
+<style>
+  .fav-grid { display:flex; flex-direction:column; gap:0.65rem; }
+  .fav-card { background:var(--surface); border:1.5px solid var(--border); border-radius:var(--radius); padding:1.5rem 1.6rem; backdrop-filter:blur(14px); transition:border-color 0.2s, background 0.2s; }
+  .fav-card:hover { border-color:var(--border2); background:var(--surface2); }
+  .fav-title { font-family:var(--font-entry); font-size:1.1rem; font-weight:500; color:var(--text); margin-bottom:0.3rem; }
+  .fav-content { max-height:100px; overflow-y:auto; font-family:var(--font-entry); font-size:14px; color:var(--text-muted); line-height:1.75; white-space:pre-wrap; margin:0.7rem 0; padding-right:0.5rem; font-style:italic; }
+  .fav-footer { display:flex; justify-content:flex-end; margin-top:0.5rem; }
+</style>
+{% endblock %}
+{% block body %}
+<nav class="topnav">
+  <a href="{% url 'home' %}" class="brand">Reflecto</a>
+  <div class="nav-links">
+    <a href="{% url 'dashboard' %}" class="nav-link">Dashboard</a>
+    <a href="{% url 'view_entries' %}" class="nav-link">All Entries</a>
+    <form method="post" action="{% url 'logout' %}" style="display:inline">
+      {% csrf_token %}<button type="submit" class="btn btn-ghost btn-sm">Sign out</button>
+    </form>
+  </div>
+</nav>
+<div class="main-content">
+  <div class="page-heading fade-in">
+    <h1>Favourites</h1>
+    <p class="sub">Your most cherished diary entries</p>
+  </div>
+  <div class="fav-grid fade-in-2">
+    {% if entries %}
+      {% for entry in entries %}
+      <div class="fav-card">
+        <div class="fav-title">⭐ {{ entry.title }}</div>
+        <div class="entry-meta">
+          <span>{{ entry.created_at|date:"d M Y" }}</span>
+          {% if entry.category %}<span class="tag">{{ entry.category.name }}</span>{% endif %}
+        </div>
+        <div class="fav-content">{{ entry.content }}</div>
+        <div class="fav-footer">
+          <a href="{% url 'remove_favourite' entry.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Remove from favourites?')">Remove ✕</a>
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="empty-state">
+        <h3>No favourites yet</h3>
+        <p style="font-family:var(--font-ui); font-size:13px; margin-top:0.5rem;">Mark entries as favourite to find them here!</p>
+        <a href="{% url 'view_entries' %}" class="btn btn-primary" style="margin-top:1.2rem;">Browse Entries</a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

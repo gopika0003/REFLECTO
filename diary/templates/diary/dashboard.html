@@ -1,0 +1,71 @@
+{% extends "diary/base.html" %}
+{% block title %}Dashboard ✦ REFLECTO{% endblock %}
+{% block extra_head %}
+<style>
+  /* Dashboard uses Playfair Display for all tile labels & headings */
+  .db-greeting { margin-bottom:2rem; }
+  .db-date { font-family:var(--font-ui); font-size:11px; letter-spacing:0.18em; text-transform:uppercase; color:var(--primary); margin-bottom:0.5rem; }
+  .db-name { font-family:var(--font-display); font-size:2.8rem; font-weight:600; color:var(--text); line-height:1.1; }
+  .db-name em { color:var(--primary); font-style:italic; }
+  .db-sub { font-family:var(--font-display); font-style:italic; color:var(--text-muted); font-size:1rem; margin-top:0.5rem; font-weight:400; }
+  .db-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-top:0.5rem; }
+  .db-tile {
+    background:var(--surface); border:1.5px solid var(--border);
+    border-radius:var(--radius); padding:1.8rem 1.6rem;
+    text-decoration:none; display:flex; flex-direction:column; gap:0.7rem;
+    backdrop-filter:blur(14px);
+    transition:border-color 0.2s, background 0.2s, transform 0.2s;
+    position:relative; overflow:hidden;
+  }
+  .db-tile::after {
+    content:''; position:absolute; inset:0;
+    background:linear-gradient(135deg, rgba(189,108,140,0.07) 0%, transparent 60%);
+    pointer-events:none;
+  }
+  .db-tile:hover { border-color:var(--border2); background:var(--surface2); transform:translateY(-3px); }
+  .tile-icon { font-size:1.8rem; line-height:1; }
+  .tile-label { font-family:var(--font-display); font-size:1.1rem; font-weight:600; color:var(--text); letter-spacing:0.01em; }
+  .tile-desc { font-family:var(--font-ui); font-size:12px; color:var(--text-dim); }
+  @media (max-width:500px) { .db-grid { grid-template-columns:1fr; } }
+</style>
+{% endblock %}
+{% block body %}
+<nav class="topnav">
+  <a href="{% url 'home' %}" class="brand">Reflecto</a>
+  <div class="nav-links">
+    <form method="post" action="{% url 'logout' %}" style="display:inline">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-ghost btn-sm">Sign out</button>
+    </form>
+  </div>
+</nav>
+<div class="main-content">
+  <div class="db-greeting fade-in">
+    <p class="db-date">✦ {% now "l, d F Y" %} ✦</p>
+    <h1 class="db-name">Hello, <em>{{ request.user.username }}</em></h1>
+    <p class="db-sub">What would you like to reflect on today?</p>
+  </div>
+  <div class="db-grid fade-in-2">
+    <a href="{% url 'add_entry' %}" class="db-tile">
+      <span class="tile-icon">📝</span>
+      <span class="tile-label">New Entry</span>
+      <span class="tile-desc">Write your thoughts</span>
+    </a>
+    <a href="{% url 'view_entries' %}" class="db-tile">
+      <span class="tile-icon">📖</span>
+      <span class="tile-label">All Entries</span>
+      <span class="tile-desc">Browse your history</span>
+    </a>
+    <a href="{% url 'favourites' %}" class="db-tile">
+      <span class="tile-icon">⭐</span>
+      <span class="tile-label">Favourites</span>
+      <span class="tile-desc">Your cherished moments</span>
+    </a>
+    <a href="{% url 'categories' %}" class="db-tile">
+      <span class="tile-icon">🌸</span>
+      <span class="tile-label">Categories</span>
+      <span class="tile-desc">Explore by theme</span>
+    </a>
+  </div>
+</div>
+{% endblock %}

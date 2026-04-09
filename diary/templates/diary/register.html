@@ -1,0 +1,50 @@
+{% extends "diary/base.html" %}
+{% block title %}Create Account ✦ REFLECTO{% endblock %}
+{% block extra_head %}
+<style>
+  .auth-wrap { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem; font-family:var(--font-auth); }
+  .auth-card { width:100%; max-width:420px; }
+  .auth-brand { text-align:center; margin-bottom:1.8rem; }
+  .auth-logo { font-family:var(--font-brand); font-size:2rem; color:var(--primary); display:block; text-decoration:none; text-shadow:0 0 18px rgba(189,108,140,0.25); }
+  .auth-sub-brand { font-family:var(--font-auth); font-size:11px; color:var(--text-dim); letter-spacing:0.18em; text-transform:uppercase; margin-top:0.3rem; }
+  .auth-card .card { font-family:var(--font-auth); }
+  .auth-title { font-family:var(--font-auth); font-size:1.55rem; font-weight:700; text-align:center; color:var(--text); margin-bottom:0.3rem; }
+  .auth-sub { font-family:var(--font-auth); text-align:center; font-size:13px; color:var(--text-dim); margin-bottom:1.8rem; }
+  .auth-card label { font-family:var(--font-auth); }
+  .auth-card input { font-family:var(--font-auth); }
+  .auth-card .btn { font-family:var(--font-auth); font-weight:700; }
+  .auth-footer { font-family:var(--font-auth); text-align:center; margin-top:1.3rem; font-size:13px; color:var(--text-dim); }
+  .auth-footer a { color:var(--primary); text-decoration:none; font-weight:700; }
+  .auth-footer a:hover { color:var(--primary-dk); }
+  .dot-row { display:flex; justify-content:center; gap:6px; margin-bottom:1.3rem; }
+  .dot-row span { width:7px; height:7px; border-radius:50%; background:var(--beige-dk); display:inline-block; }
+  .dot-row span:nth-child(2) { background:var(--primary); transform:scale(1.3); }
+</style>
+{% endblock %}
+{% block body %}
+<div class="auth-wrap">
+  <div class="auth-card fade-in">
+    <div class="auth-brand">
+      <a href="{% url 'home' %}" class="auth-logo">Reflecto</a>
+      <p class="auth-sub-brand">your personal diary</p>
+    </div>
+    <div class="card card-pixel">
+      <div class="dot-row"><span></span><span></span><span></span><span></span><span></span></div>
+      <h2 class="auth-title">Start your journey ✨</h2>
+      <p class="auth-sub">create your magical diary space</p>
+      {% if messages %}{% for message in messages %}
+        <div class="alert {% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}">{{ message }}</div>
+      {% endfor %}{% endif %}
+      <form method="POST" action="{% url 'register' %}">
+        {% csrf_token %}
+        <div class="field"><label>Username</label><input type="text" name="username" placeholder="choose a username..." required autofocus></div>
+        <div class="field"><label>Email</label><input type="email" name="email" placeholder="your email address..." required></div>
+        <div class="field"><label>Password</label><input type="password" name="password1" placeholder="create a password..." required></div>
+        <div class="field"><label>Confirm Password</label><input type="password" name="password2" placeholder="repeat your password..." required></div>
+        <button type="submit" class="btn btn-primary" style="width:100%;margin-top:0.6rem;">Create My Diary</button>
+      </form>
+    </div>
+    <div class="auth-footer">Already have an account? <a href="{% url 'login' %}">Sign in →</a></div>
+  </div>
+</div>
+{% endblock %}

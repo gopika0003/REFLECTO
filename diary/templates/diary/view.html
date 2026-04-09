@@ -1,0 +1,117 @@
+{% extends "diary/base.html" %}
+{% block title %}All Entries ✦ REFLECTO{% endblock %}
+{% block extra_head %}
+<style>
+  .toolbar { display:flex; align-items:center; gap:0.7rem; margin-bottom:1.4rem; flex-wrap:wrap; }
+  input[type="date"] { width:auto; padding:0.45rem 0.85rem; font-size:13px; }
+  .entries-list { display:flex; flex-direction:column; gap:0.65rem; }
+  .btn-view, .btn-edit {
+    background:transparent; border:1.5px solid var(--border); color:var(--text-muted);
+    padding:0.3rem 0.75rem; font-size:11px; border-radius:999px; cursor:pointer;
+    transition:all 0.2s; font-family:var(--font-ui); font-weight:600; letter-spacing:0.04em;
+  }
+  .btn-view:hover { border-color:var(--primary); color:var(--primary); }
+  .btn-edit:hover { border-color:var(--primary-lt); color:var(--primary-lt); }
+  /* Modal edit fields */
+  .modal-field { margin-bottom:0.9rem; }
+  .modal-field label { font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--text-muted); display:block; margin-bottom:0.3rem; font-family:var(--font-ui); }
+  /* Entry content in modals uses Lora */
+  .modal-field textarea { font-family:var(--font-entry) !important; font-size:14px !important; line-height:1.8 !important; }
+</style>
+{% endblock %}
+{% block body %}
+<nav class="topnav">
+  <a href="{% url 'home' %}" class="brand">Reflecto</a>
+  <div class="nav-links">
+    <a href="{% url 'dashboard' %}" class="nav-link">Dashboard</a>
+    <a href="{% url 'add_entry' %}" class="nav-link">+ New</a>
+    <form method="post" action="{% url 'logout' %}" style="display:inline">
+      {% csrf_token %}<button type="submit" class="btn btn-ghost btn-sm">Sign out</button>
+    </form>
+  </div>
+</nav>
+<div class="main-content">
+  <div class="page-heading fade-in">
+    <h1>All Entries</h1>
+    <p class="sub">{{ entries|length }} entr{{ entries|length|pluralize:"y,ies" }} in your diary</p>
+  </div>
+  <div class="toolbar fade-in">
+    <form method="GET" style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
+      <input type="date" name="date" value="{{ request.GET.date }}">
+      <button type="submit" class="btn btn-ghost btn-sm">Search</button>
+      <a href="{% url 'view_entries' %}" class="btn btn-ghost btn-sm">Reset</a>
+    </form>
+  </div>
+  <div class="entries-list fade-in-2">
+    {% if entries %}
+      {% for entry in entries %}
+      <div class="entry-card">
+        <div style="flex:1; min-width:0;">
+          <div class="entry-title">{{ entry.title }}{% if entry.is_favourite %} ⭐{% endif %}</div>
+          <div class="entry-meta">
+            <span>{{ entry.created_at|date:"d M Y" }}</span>
+            {% if entry.category %}<span class="tag">{{ entry.category.name }}</span>{% endif %}
+          </div>
+        </div>
+        <div class="entry-actions">
+          <button class="btn-view" onclick="openView('view_{{ entry.id }}')">View</button>
+          <button class="btn-edit" onclick="openView('edit_{{ entry.id }}')">Edit</button>
+          <a href="{% url 'delete_entry' entry.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Delete this entry?')">✕</a>
+        </div>
+      </div>
+
+      <!-- View Modal -->
+      <div class="modal-overlay" id="view_{{ entry.id }}" onclick="closeIfBg(event, this)">
+        <div class="modal-box">
+          <button class="modal-close" onclick="closeView('view_{{ entry.id }}')">✕</button>
+          <p style="font-family:var(--font-ui); font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--text-dim); margin-bottom:0.4rem;">{{ entry.created_at|date:"d F Y" }} {% if entry.category %}· {{ entry.category.name }}{% endif %}</p>
+          <h3 class="modal-title">{{ entry.title }}</h3>
+          <div class="entry-body">{{ entry.content }}</div>
+        </div>
+      </div>
+
+      <!-- Edit Modal -->
+      <div class="modal-overlay" id="edit_{{ entry.id }}" onclick="closeIfBg(event, this)">
+        <div class="modal-box">
+          <button class="modal-close" onclick="closeView('edit_{{ entry.id }}')">✕</button>
+          <h3 class="modal-title">Edit Entry</h3>
+          <form method="POST" action="{% url 'edit_entry' entry.id %}">
+            {% csrf_token %}
+            <div class="modal-field"><label>Title</label><input type="text" name="title" value="{{ entry.title }}" style="font-family:var(--font-entry);"></div>
+            <div class="modal-field"><label>Content</label><textarea name="content" rows="5">{{ entry.content }}</textarea></div>
+            <div class="modal-field"><label>Category</label>
+              <select name="category">
+                {% for cat in categories %}
+                  <option value="{{ cat.id }}" {% if entry.category and entry.category.id == cat.id %}selected{% endif %}>{{ cat.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="modal-field">
+              <label class="check-row" style="text-transform:none; letter-spacing:0; font-size:13px;">
+                <input type="checkbox" name="favourite" {% if entry.is_favourite %}checked{% endif %}>
+                <span>⭐ Mark as favourite</span>
+              </label>
+            </div>
+            <div style="display:flex; justify-content:flex-end; gap:0.7rem; margin-top:1rem;">
+              <button type="button" class="btn btn-ghost" onclick="closeView('edit_{{ entry.id }}')">Cancel</button>
+              <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
+          </form>
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="empty-state">
+        <h3>No entries yet</h3>
+        <p style="font-family:var(--font-ui); font-size:13px; margin-top:0.5rem;">Start writing your first entry!</p>
+        <a href="{% url 'add_entry' %}" class="btn btn-primary" style="margin-top:1.2rem;">+ New Entry</a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+<script>
+function openView(id) { document.getElementById(id).classList.add('open'); document.body.style.overflow='hidden'; }
+function closeView(id) { document.getElementById(id).classList.remove('open'); document.body.style.overflow=''; }
+function closeIfBg(e, el) { if (e.target === el) { el.classList.remove('open'); document.body.style.overflow=''; } }
+</script>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends "diary/base.html" %}
+{% block title %}Categories ✦ REFLECTO{% endblock %}
+{% block extra_head %}
+<style>
+  .cat-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(180px, 1fr)); gap:1rem; margin-top:0.5rem; }
+  .cat-tile { background:var(--surface); border:1.5px solid var(--border); border-radius:var(--radius); padding:2rem 1.5rem; text-align:center; text-decoration:none; display:block; backdrop-filter:blur(14px); transition:border-color 0.2s, background 0.2s, transform 0.2s; position:relative; overflow:hidden; }
+  .cat-tile::before { content:''; position:absolute; inset:0; background:linear-gradient(135deg, rgba(189,108,140,0.07) 0%, transparent 60%); pointer-events:none; }
+  .cat-tile:hover { border-color:var(--border2); background:var(--surface2); transform:translateY(-3px); }
+  .cat-icon { font-size:1.8rem; margin-bottom:0.7rem; display:block; }
+  .cat-name { font-family:var(--font-display); font-size:1rem; font-weight:600; color:var(--text); }
+</style>
+{% endblock %}
+{% block body %}
+<nav class="topnav">
+  <a href="{% url 'home' %}" class="brand">Reflecto</a>
+  <div class="nav-links">
+    <a href="{% url 'dashboard' %}" class="nav-link">Dashboard</a>
+    <a href="{% url 'view_entries' %}" class="nav-link">All Entries</a>
+    <form method="post" action="{% url 'logout' %}" style="display:inline">
+      {% csrf_token %}<button type="submit" class="btn btn-ghost btn-sm">Sign out</button>
+    </form>
+  </div>
+</nav>
+<div class="main-content">
+  <div class="page-heading fade-in">
+    <h1>Categories</h1>
+    <p class="sub">Explore your entries by theme</p>
+  </div>
+  <div class="cat-grid fade-in-2">
+    {% for cat in categories %}
+    <a href="{% url 'category_entries' cat.id %}" class="cat-tile">
+      <span class="cat-icon">✦</span>
+      <span class="cat-name">{{ cat.name }}</span>
+    </a>
+    {% empty %}
+    <div class="empty-state" style="grid-column:1/-1;">
+      <h3>No categories yet</h3>
+      <p style="font-family:var(--font-ui); font-size:13px; margin-top:0.5rem;">Categories are managed from the admin panel.</p>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

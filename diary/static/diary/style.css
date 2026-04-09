@@ -1,0 +1,33 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to right, #8360c3, #2ebf91);
+    color: white;
+}
+
+.container {
+    text-align: center;
+    margin-top: 120px;
+}
+
+h1 {
+    font-size: 48px;
+    letter-spacing: 2px;
+}
+
+p {
+    font-size: 18px;
+    margin-top: 10px;
+}
+
+.btn {
+    display: inline-block;
+    margin-top: 25px;
+    padding: 12px 30px;
+    background-color: white;
+    color: #2ebf91;
+    text-decoration: none;
+    border-radius: 30px;
+    font-weight: bold;
+}

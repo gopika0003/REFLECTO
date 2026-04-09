@@ -1,0 +1,60 @@
+{% extends "diary/base.html" %}
+{% block title %}{{ category.name }} ✦ REFLECTO{% endblock %}
+{% block extra_head %}
+<style>
+  .entries-list { display:flex; flex-direction:column; gap:0.65rem; }
+  .btn-pop { background:transparent; border:1.5px solid var(--border); color:var(--text-muted); padding:0.3rem 0.75rem; font-size:11px; border-radius:999px; cursor:pointer; transition:all 0.2s; font-family:var(--font-ui); font-weight:600; }
+  .btn-pop:hover { border-color:var(--primary); color:var(--primary); }
+</style>
+{% endblock %}
+{% block body %}
+<nav class="topnav">
+  <a href="{% url 'home' %}" class="brand">Reflecto</a>
+  <div class="nav-links">
+    <a href="{% url 'categories' %}" class="nav-link">Categories</a>
+    <a href="{% url 'dashboard' %}" class="nav-link">Dashboard</a>
+    <form method="post" action="{% url 'logout' %}" style="display:inline">
+      {% csrf_token %}<button type="submit" class="btn btn-ghost btn-sm">Sign out</button>
+    </form>
+  </div>
+</nav>
+<div class="main-content">
+  <div class="page-heading fade-in">
+    <h1>{{ category.name }}</h1>
+    <p class="sub">{{ entries|length }} entr{{ entries|length|pluralize:"y,ies" }} in this category</p>
+  </div>
+  <div class="entries-list fade-in-2">
+    {% if entries %}
+      {% for entry in entries %}
+      <div class="entry-card">
+        <div style="flex:1; min-width:0;">
+          <div class="entry-title">{{ entry.title }}{% if entry.is_favourite %} ⭐{% endif %}</div>
+          <div class="entry-meta">{{ entry.created_at|date:"d M Y" }}</div>
+        </div>
+        <div class="entry-actions">
+          <button class="btn-pop" onclick="openView('pop_{{ entry.id }}')">View</button>
+        </div>
+      </div>
+      <div class="modal-overlay" id="pop_{{ entry.id }}" onclick="closeIfBg(event, this)">
+        <div class="modal-box">
+          <button class="modal-close" onclick="closeView('pop_{{ entry.id }}')">✕</button>
+          <p style="font-family:var(--font-ui); font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--text-dim); margin-bottom:0.4rem;">{{ entry.created_at|date:"d F Y" }}</p>
+          <h3 class="modal-title">{{ entry.title }}</h3>
+          <div class="entry-body">{{ entry.content }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="empty-state">
+        <h3>No entries yet</h3>
+        <p style="font-family:var(--font-ui); font-size:13px; margin-top:0.5rem;">No entries saved in this category.</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+<script>
+function openView(id) { document.getElementById(id).classList.add('open'); document.body.style.overflow='hidden'; }
+function closeView(id) { document.getElementById(id).classList.remove('open'); document.body.style.overflow=''; }
+function closeIfBg(e, el) { if (e.target === el) { el.classList.remove('open'); document.body.style.overflow=''; } }
+</script>
+{% endblock %}
